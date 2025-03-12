@@ -5,5 +5,5 @@ build-backend = "setuptools.build_meta"
 [tool.setuptools_scm]
 version_scheme = "release-branch-semver"
 local_scheme = "no-local-version"
-write_to = "etformat/_version.py"
+write_to = "scia/_version.py"
 

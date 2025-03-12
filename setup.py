@@ -9,7 +9,7 @@ setup(
     description="A Python package for eye-tracking data processing",
     long_description=open("README.md", encoding="utf-8").read(),
     long_description_content_type="text/markdown",
-    url="https://github.com/yourusername/scia",
+    url="https://github.com/Ahsankhodami/scia",
     packages=find_packages(),
     include_package_data=True,
     classifiers=[
