@@ -5,19 +5,21 @@ on:
     tags:
       - 'v*' # Trigger this workflow for any tag push that starts with v
 
+permissions:
+  contents: read
+  id-token: write # Allow the workflow to request an ID token
+
 jobs:
   build-and-publish:
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repository
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 0 # Ensures a full git history is fetched for setuptools_scm
 
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.12' # Make sure to match the Python version you're using
+          python-version: '3.12' # Ensure this matches your project's requirements
 
       - name: Install dependencies
         run: |
