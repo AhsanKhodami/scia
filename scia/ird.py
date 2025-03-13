@@ -1,3 +1,4 @@
+
 import pandas as pd
 import numpy as np
 from scia.preprocess import prepare_scd
@@ -60,4 +61,4 @@ def ird(data, dvar="values", pvar="phase", decreasing=False, phases=("A", "B")):
     else:
         print("Note: Analysis assumes that higher values in B-phase represent improvement.")
     
-    # return out
+    return out

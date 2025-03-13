@@ -25,3 +25,10 @@ from .smd import smd
 from .summary import summary_scd
 from .tau_u import tau_u
 from .utils import revise_names
+from .autocorr import autocorr
+from .corrected_tau import corrected_tau
+from .nap import nap
+from .overlap import overlap
+from .select import select_cases
+
+
