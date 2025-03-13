@@ -24,7 +24,7 @@ setup(
         "matplotlib",
         "scipy",
         "openpyxl",
-        "sklearn",
+        " scikit-learn",
         "scipy",
         "statsmodels"
     ],
