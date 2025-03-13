@@ -4,6 +4,10 @@
 format: jb-book
 root: intro
 chapters:
-- file: markdown
-- file: notebooks
-- file: markdown-notebooks
+  - file: markdown
+  - file: installation
+  - file: create-dataframe
+  - file: import-update
+  - file: import-export
+  - file: fill_missing
+  - file: autocorrelation
