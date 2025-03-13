@@ -6,7 +6,7 @@ setup(
     setup_requires=["setuptools-scm"],
     author="Mohammad Ahsan Khodami",
     author_email="ahsan.khodami@gmail.com", 
-    description="A Python package for Single Case Design Analysis",
+    description="A Comprerhensive most updated Python package for Single Case Design Analysis",
     long_description=open("README.md", encoding="utf-8").read(),
     long_description_content_type="text/markdown",
     url="https://github.com/Ahsankhodami/scia",
