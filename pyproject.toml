@@ -29,5 +29,9 @@ dependencies = [
 [project.urls]
 "Homepage" = "https://github.com/Ahsankhodami/scia"
 
+[tool.setuptools]
+packages = ["scia"]
+
 [tool.setuptools-scm]
 write_to = "scia/_version.py"
+write_to_template = '__version__ = "{version}"'
