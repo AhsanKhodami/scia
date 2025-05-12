@@ -35,5 +35,6 @@ packages = ["scia"]
 [tool.setuptools_scm]
 version_scheme = "guess-next-dev"
 local_scheme = "no-local-version"
+fallback_version = "0.0.999"
 write_to = "scia/_version.py"
 write_to_template = '__version__ = "{version}"'

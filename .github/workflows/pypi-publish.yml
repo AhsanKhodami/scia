@@ -3,60 +3,51 @@ name: Publish to PyPI
 on:
   push:
     tags:
-      - 'v*'
+      - "v*"
 
 permissions:
   contents: read
-  id-token: write
+  id-token: write  # Required for PyPI Trusted Publishing
 
 jobs:
   build-and-publish:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check out the repository
+      - name: Check out repository with full history
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 0  # required for setuptools-scm to see tags
 
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.12'
+          python-version: "3.12"
 
-      - name: Install dependencies
+      - name: Install build dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install build setuptools-scm wheel twine
+          pip install build setuptools-scm[toml] wheel twine
 
-      - name: Extract tag version
-        id: get_tag
+      - name: Verify Git tag and HEAD
         run: |
-          echo "TAG_NAME=${GITHUB_REF##*/}" >> $GITHUB_ENV
+          echo "🔖 GITHUB_REF = $GITHUB_REF"
+          echo "🔢 Extracted tag = ${GITHUB_REF##*/}"
+          git describe --tags --exact-match || echo "⚠️ No exact tag match"
 
-      - name: Show tag and git info
-        run: |
-          echo "Current tag: $TAG_NAME"
-          git describe --tags || echo "⚠️ No tag found"
-          git rev-parse HEAD
+      - name: Extract version from tag
+        id: tag_version
+        run: echo "VERSION=${GITHUB_REF##*/}" >> $GITHUB_ENV
 
-      - name: Build the package with forced version
+      - name: Build package with forced version
         run: |
-          python -m build
+          echo "📦 Building version: ${VERSION#v}"
+          SETUPTOOLS_SCM_PRETEND_VERSION=${VERSION#v} python -m build
         env:
-          SETUPTOOLS_SCM_PRETEND_VERSION: ${{ env.TAG_NAME }}
           SETUPTOOLS_SCM_DEBUG: "1"
 
-      - name: Check the built wheel
-        run: |
-          python -m wheel unpack dist/*.whl
-          find . -name METADATA -exec cat {} \;
+      - name: Check built package
+        run: twine check dist/*
 
-      - name: Check package with twine
-        run: |
-          twine check dist/*
-
-      - name: Publish the package to PyPI
+      - name: Publish to PyPI (trusted publishing)
         uses: pypa/gh-action-pypi-publish@v1.8.11
-        with:
-          password: ${{ secrets.PYPI_API_TOKEN }}
