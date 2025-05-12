@@ -5,44 +5,30 @@ on:
     tags:
       - "v*"
 
-permissions:
-  contents: read
-  id-token: write
-
 jobs:
-  build-and-publish:
+  publish:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-
+      - name: Check out the repository
+        uses: actions/checkout@v3
+      
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: "3.12"
-
+      
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install build wheel twine
-
-      - name: Build package
-        run: |
-          python -m build
-
-      - name: Debug built package
-        run: |
-          echo "=== Built files ==="
-          ls -la dist/
-          echo "=== Twine check result ==="
-          twine check dist/*
-          echo "=== Contents of wheel ==="
-          python -m zipfile -l dist/*.whl
-          echo "=== Extract and check METADATA ==="
-          python -m zipfile -e dist/*.whl temp_check
-          echo "=== METADATA content ==="
-          cat temp_check/*/METADATA
-
+          pip install build twine
+      
+      - name: Clean old build artifacts
+        run: rm -rf dist/ build/ *.egg-info
+      
+      - name: Build the package
+        run: python -m build
+      
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@v1.8.11
+        with:
+          password: ${{ secrets.PYPI_API_TOKEN }}
