@@ -10,7 +10,7 @@ def pand(data, dvar="values", pvar="phase", decreasing=False, phases=("A", "B"),
     Compute the Percentage of All Non-Overlapping Data (PAND) for single-case data.
 
     Parameters:
-    - data (pd.DataFrame): The single-case data.
+    - data (pd.DataFrame or list): The single-case data. Can be a single DataFrame or a list of DataFrames.
     - dvar (str): Name of the dependent variable column.
     - pvar (str): Name of the phase variable column.
     - decreasing (bool, default=False): If True, expects lower values in B-phase.
@@ -22,6 +22,9 @@ def pand(data, dvar="values", pvar="phase", decreasing=False, phases=("A", "B"),
     - Dict: Contains `pand`, `n`, `n_a`, `n_b` if `return_values=True`.
     - Dict: Full results object with class 'sc_pand' when `return_values=False`.
     """
+    # Handle list of DataFrames by concatenating them
+    if isinstance(data, list):
+        data = pd.concat(data, ignore_index=True)
 
     # Ensure "case" column exists
     if "case" not in data.columns:

@@ -45,10 +45,16 @@ def plm(data, dvar="values", pvar="phase", mvar="mt",
     Returns:
     - None: Prints the formatted summary of the piecewise regression analysis.
     """
+    # Check for multiple cases
+    if isinstance(data, list):
+        print("Error: PLM cannot be applied to multiple cases simultaneously.")
+        print("Please use HPLM (Hierarchical Piecewise Linear Model) for multiple case analysis.")
+        return
+        
     # Check arguments
     if family != "gaussian" and AR != 0:
         raise ValueError("Family is not 'gaussian' but AR is set.")
-
+    
     if family == "binomial" and var_trials is None:
         raise ValueError("Family is 'binomial' but 'var_trials' is not defined.")
 

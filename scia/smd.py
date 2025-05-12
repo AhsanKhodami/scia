@@ -9,7 +9,7 @@ def smd(data, dvar="values", pvar="phase", mvar="mt", phases=(1, 2)):
     Compute standardized mean differences for single-case data.
 
     Parameters:
-    - data (pd.DataFrame): The single-case data.
+    - data (pd.DataFrame or list): The single-case data or list of DataFrames for multiple cases.
     - dvar (str): Name of the dependent variable column.
     - pvar (str): Name of the phase variable column.
     - mvar (str): Name of the measurement-time variable column.
@@ -19,6 +19,19 @@ def smd(data, dvar="values", pvar="phase", mvar="mt", phases=(1, 2)):
     - pd.DataFrame: A DataFrame containing computed effect sizes and phase details.
     """
     
+    # Handle multiple cases
+    if isinstance(data, list):
+        all_data = []
+        for case_data in data:
+            # Process each case
+            case_df = case_data.copy()
+            if "case" not in case_df.columns:
+                case_df["case"] = case_df.get("name", "Default_Case")
+            case_result = smd(case_df, dvar, pvar, mvar, phases)
+            all_data.append(case_result)
+        return pd.concat(all_data, ignore_index=True)
+    
+    # Single case processing
     # Ensure we're working on a copy to avoid SettingWithCopyWarning
     data = data.copy()
     

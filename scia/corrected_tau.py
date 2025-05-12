@@ -7,7 +7,67 @@ from scia.utils import revise_names
 from scia.tau_u import kendall_tau, tau_u
 import statsmodels.formula.api as smf
 
-def corrected_tau(data, dvar="values", pvar="phase", mvar="mt", phases=("A", "B"), alpha=0.05, continuity=False, repeated=False, tau_method="b"):
+def corrected_tau(data, dvar=None, pvar=None, mvar=None, phases=("A", "B"), 
+                 alpha=0.05, continuity=True, repeated=False, tau_method="b"):
+    """
+    Calculate baseline-corrected Tau.
+    
+    Parameters:
+    ----------
+    data : pandas.DataFrame or list
+        Single-case data frame or list of data frames
+    dvar : str, optional
+        Name of the dependent variable column
+    pvar : str, optional
+        Name of the phase variable column
+    mvar : str, optional
+        Name of the measurement time variable column
+    phases : tuple, default=("A", "B")
+        Phases to include in the analysis
+    alpha : float, default=0.05
+        Significance level
+    continuity : bool, default=True
+        Whether to apply continuity correction
+    repeated : bool, default=False
+        Whether to use repeated measures
+    tau_method : str, default="b"
+        Tau method to use ("a", "b", or "c")
+    
+    Returns:
+    -------
+    pandas.DataFrame
+        DataFrame with corrected Tau results
+    """
+    # Handle missing variable names
+    if dvar is None:
+        dvar = 'values'
+    if pvar is None:
+        pvar = 'phase'
+    if mvar is None:
+        mvar = 'mt'
+    
+    # If data is a list of DataFrames, process each one and combine results
+    if isinstance(data, list):
+        results_list = []
+        for i, df in enumerate(data):
+            # Ensure each DataFrame has a case column
+            if 'case' not in df.columns:
+                df = df.copy()
+                df['case'] = i + 1
+            # Process this DataFrame
+            single_result = corrected_tau(df, dvar, pvar, mvar, phases, alpha, continuity, repeated, tau_method)
+            # Add case identifier if not already present
+            if 'Case' not in single_result.columns:
+                single_result['Case'] = df['case'].iloc[0]
+            results_list.append(single_result)
+        
+        # Combine all results
+        if results_list:
+            return pd.concat(results_list, ignore_index=True)
+        else:
+            return pd.DataFrame()  # Return empty DataFrame if no data
+    
+    # Handle single DataFrame case
     # Prepare the data
     data_list = prepare_scd(data)
     data_list = recombine_phases(data_list, phases=phases)  # Corrected: use DataFrame directly

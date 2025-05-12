@@ -10,7 +10,7 @@ def nap(data, dvar="values", pvar="phase", decreasing=False, phases=("A", "B")):
     Compute the Nonoverlap of All Pairs (NAP) for single-case data.
 
     Parameters:
-    - data (pd.DataFrame): The single-case dataset.
+    - data (pd.DataFrame or list): The single-case dataset or list of datasets.
     - dvar (str): Name of the dependent variable column.
     - pvar (str): Name of the phase variable column.
     - decreasing (bool, default=False): If True, considers lower values in Phase B as improvement.
@@ -19,6 +19,25 @@ def nap(data, dvar="values", pvar="phase", decreasing=False, phases=("A", "B")):
     Returns:
     - pd.DataFrame: A summary of NAP calculations.
     """
+    
+    # Handle list of DataFrames (multiple cases)
+    if isinstance(data, list):
+        # Process each DataFrame separately
+        all_results = []
+        for i, df in enumerate(data):
+            # Ensure each DataFrame has a case column
+            if 'case' not in df.columns:
+                df = df.copy()
+                df['case'] = i + 1
+            # Process this DataFrame
+            result = nap(df, dvar, pvar, decreasing, phases)
+            all_results.append(result)
+        
+        # Combine all results
+        if all_results:
+            return pd.concat(all_results, ignore_index=True)
+        else:
+            return pd.DataFrame()  # Return empty DataFrame if no data
     
     # Ensure "case" column exists
     if "case" not in data.columns:

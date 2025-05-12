@@ -2,33 +2,34 @@ import pandas as pd
 
 def prepare_scd(data, na_rm=False):
     """
-    Prepare a Single-Case DataFrame (SCD) for further analysis.
-
+    Prepare single-case data for analysis.
+    
     Parameters:
-    - data (pd.DataFrame): The SCD dataset.
-    - na_rm (bool, default=False): If True, removes rows where the dependent variable is NaN.
-
+    ----------
+    data : pandas.DataFrame or list
+        Single-case data frame or list of data frames
+    na_rm : bool, default=False
+        Whether to remove rows with missing values
+    
     Returns:
-    - pd.DataFrame: A cleaned and formatted DataFrame.
+    -------
+    pandas.DataFrame or list
+        Prepared data
     """
-
-    # Column names mapping
+    # If data is a list, process each DataFrame separately
+    if isinstance(data, list):
+        return [prepare_scd(df, na_rm) for df in data]
+    
+    # Default variable names
     pvar = "phase"  # Phase variable
-    mvar = "mt"     # Measurement-time variable
+    mvar = "mt"     # Measurement time variable
     dvar = "values" # Dependent variable
-
+    
     # Ensure column names are correctly formatted
     data.columns = [col.strip() for col in data.columns]
-
+    
     # Remove rows with missing dependent variable values if na_rm=True
     if na_rm:
         data = data.dropna(subset=[dvar])
-
-    # Ensure phase column is a categorical variable
-    if not pd.api.types.is_categorical_dtype(data[pvar]):
-        data[pvar] = data[pvar].astype("category")
-
-    # Drop unused categories in phase
-    data[pvar] = data[pvar].cat.remove_unused_categories()
-
+    
     return data

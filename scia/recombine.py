@@ -1,24 +1,56 @@
 import pandas as pd
 
-def recombine_phases(data, phases=(1, 2), set_phases=True, phase_names=("A", "B"), pvar="phase"):
+def recombine_phases(data, phases=None, set_phases=None, phase_names=None, pvar="phase"):
     """
-    Recombine phases in a Single-Case DataFrame (SCD).
-
+    Recombine phases in single-case data.
+    
     Parameters:
-    - data (pd.DataFrame): The SCD dataset.
-    - phases (tuple or list): Two phases to combine (numeric index or names).
-    - set_phases (bool, default=True): Whether to rename the phases.
-    - phase_names (tuple, default=("A", "B")): Names for the new phases.
-    - pvar (str, default="phase"): The phase column name.
-
+    ----------
+    data : pandas.DataFrame or list
+        Single-case data frame or list of data frames
+    phases : tuple, optional
+        Phases to include
+    set_phases : dict, optional
+        Dictionary mapping phase names to new phase names
+    phase_names : list, optional
+        List of phase names
+    pvar : str, default="phase"
+        Name of the phase variable column
+    
     Returns:
-    - pd.DataFrame: A modified SCD dataset with recombined phases.
+    -------
+    pandas.DataFrame
+        Recombined data
     """
-    warning_messages = []
+    # If data is a list of DataFrames, process each one and combine them
+    if isinstance(data, list):
+        # Process each DataFrame separately
+        processed_dfs = []
+        for i, df in enumerate(data):
+            # Ensure each DataFrame has a case column
+            if 'case' not in df.columns:
+                df = df.copy()
+                df['case'] = i + 1
+            # Process this DataFrame
+            processed_df = recombine_phases(df, phases, set_phases, phase_names, pvar)
+            processed_dfs.append(processed_df)
+        
+        # Combine all processed DataFrames
+        if processed_dfs:
+            return pd.concat(processed_dfs, ignore_index=True)
+        else:
+            return pd.DataFrame()  # Return empty DataFrame if no data
+    
+    # Handle single DataFrame case
     dropped_cases = []
     design_list = []
+    warning_messages = []  # Initialize warning_messages list
     
-    for case in data["case"].unique():
+    # Get unique case values
+    case_names = data["case"].unique()
+    
+    # Process each case
+    for case in case_names:
         case_data = data[data["case"] == case].copy()
         phase_values = case_data[pvar].astype(str).tolist()
         unique_phases = list(pd.Series(phase_values).unique())

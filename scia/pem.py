@@ -10,7 +10,7 @@ def pem(data, dvar="values", pvar="phase", decreasing=False, binom_test_flag=Tru
     Compute the Percentage Exceeding the Median (PEM) for single-case data.
 
     Parameters:
-    - data (pd.DataFrame): The single-case dataset.
+    - data (pd.DataFrame or list): The single-case dataset or list of datasets.
     - dvar (str): Name of the dependent variable column.
     - pvar (str): Name of the phase variable column.
     - decreasing (bool, default=False): If True, checks for lower values in Phase B.
@@ -22,6 +22,12 @@ def pem(data, dvar="values", pvar="phase", decreasing=False, binom_test_flag=Tru
     Returns:
     - pd.DataFrame: A summary of PEM calculations.
     """
+    
+    # Handle list of dataframes
+    if isinstance(data, list):
+        # Combine all dataframes into one
+        combined_data = pd.concat(data, ignore_index=True)
+        return pem(combined_data, dvar, pvar, decreasing, binom_test_flag, chi_test, fun, phases, **kwargs)
 
     # Ensure "case" column exists
     if "case" not in data.columns:

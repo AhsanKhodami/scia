@@ -8,7 +8,7 @@ def pnd(data, dvar="values", pvar="phase", decreasing=False, phases=("A", "B")):
     Compute the Percentage of Non-Overlapping Data (PND) for single-case data.
 
     Parameters:
-    - data (pd.DataFrame): The single-case data.
+    - data (pd.DataFrame or list): The single-case data or list of DataFrames for multiple cases.
     - dvar (str): Name of the dependent variable column.
     - pvar (str): Name of the phase variable column.
     - decreasing (bool, default=False): If True, expects lower values in B-phase.
@@ -17,6 +17,18 @@ def pnd(data, dvar="values", pvar="phase", decreasing=False, phases=("A", "B")):
     Returns:
     - pd.DataFrame: A DataFrame containing PND results for each case.
     """
+    
+    # Handle multiple cases
+    if isinstance(data, list):
+        all_data = []
+        for case_data in data:
+            # Process each case
+            case_df = case_data.copy()
+            if "case" not in case_df.columns:
+                case_df["case"] = case_df.get("name", "Default_Case")
+            case_result = pnd(case_df, dvar, pvar, decreasing, phases)
+            all_data.append(case_result)
+        return pd.concat(all_data, ignore_index=True)
 
     # Ensure "case" column exists
     if "case" not in data.columns:

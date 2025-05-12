@@ -20,7 +20,30 @@ def autocorr(data, dvar="values", pvar="phase", mvar="mt", lag_max=3):
     """
 
     # Prepare the data
+    if isinstance(data, list):
+        # Process each DataFrame separately and then combine results
+        results_list = []
+        for i, df in enumerate(data):
+            # Ensure each DataFrame has a case column
+            if 'case' not in df.columns:
+                df = df.copy()
+                df['case'] = i + 1
+            # Process this DataFrame
+            single_result = autocorr(df, dvar, pvar, mvar, lag_max)
+            results_list.append(single_result)
+        
+        # Combine all results
+        if results_list:
+            return pd.concat(results_list, ignore_index=True)
+        else:
+            return pd.DataFrame()  # Return empty DataFrame if no data
+    
+    # Ensure data is properly prepared
     data = prepare_scd(data)
+    
+    # Add case column if missing
+    if 'case' not in data.columns:
+        data['case'] = 1
 
     # Extract unique cases
     case_names = data["case"].unique()
@@ -38,7 +61,11 @@ def autocorr(data, dvar="values", pvar="phase", mvar="mt", lag_max=3):
 
         # Compute autocorrelation for each phase
         for phase in phases:
-            phase_data = case_data[case_data[pvar] == phase][dvar].dropna()
+            phase_data = pd.to_numeric(
+                case_data[case_data[pvar] == phase][dvar].dropna(),
+                errors='coerce'
+            )
+            
             if len(phase_data) > 1:
                 max_lag = min(len(phase_data) - 1, lag_max)
                 ac_values = acf(phase_data, nlags=max_lag, fft=False)[1:]  # Ignore lag 0
@@ -49,7 +76,11 @@ def autocorr(data, dvar="values", pvar="phase", mvar="mt", lag_max=3):
             df_results.loc[len(df_results)] = row
 
         # Compute autocorrelation across all phases
-        all_data = case_data[dvar].dropna()
+        all_data = pd.to_numeric(
+            case_data[dvar].dropna(),
+            errors='coerce'
+        )
+        
         if len(all_data) > 1:
             max_lag = min(len(all_data) - 1, lag_max)
             ac_values = acf(all_data, nlags=max_lag, fft=False)[1:]

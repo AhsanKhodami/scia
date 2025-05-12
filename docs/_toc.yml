@@ -10,4 +10,9 @@ chapters:
   - file: import-update
   - file: import-export
   - file: fill_missing
+  - file: describe
+  - file: rci
+  - file: ird
+  - file: nap
+  - file: pand
   - file: autocorrelation

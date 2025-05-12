@@ -1,17 +1,27 @@
 import pandas as pd
 
-def summary_scd(data, max_cases=10):
+def summary(data, max_cases=10):
     """
     Generate a summary of a Single-Case DataFrame (SCD) with proper formatting.
 
     Parameters:
-    - data (pd.DataFrame): The SCD dataset.
+    - data (pd.DataFrame or list): The SCD dataset or list of datasets.
     - max_cases (int, default=10): Maximum cases to display before truncating.
 
     Returns:
     - None: Prints a formatted summary.
     """
-
+    # Handle list of DataFrames (multiple cases)
+    if isinstance(data, list):
+        # Process each DataFrame separately and combine them
+        combined_data = pd.concat([df.copy() for df in data], ignore_index=True)
+        # Ensure each DataFrame has a case column
+        for i, df in enumerate(data):
+            if 'case' not in df.columns:
+                df['case'] = i + 1
+        # Use the combined data for the summary
+        data = combined_data
+    
     # Extract case names
     cases = data["case"].unique()
     num_cases = len(cases)

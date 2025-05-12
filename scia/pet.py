@@ -11,7 +11,7 @@ def pet(data, dvar="values", pvar="phase", mvar="mt", ci=0.95, decreasing=False,
     Compute the Percentage Exceeding the Trend (PET) for single-case data.
 
     Parameters:
-    - data (pd.DataFrame): The single-case dataset.
+    - data (pd.DataFrame or list/array): The single-case dataset.
     - dvar (str): Name of the dependent variable column.
     - pvar (str): Name of the phase variable column.
     - mvar (str): Name of the measurement-time variable column.
@@ -22,6 +22,22 @@ def pet(data, dvar="values", pvar="phase", mvar="mt", ci=0.95, decreasing=False,
     Returns:
     - pd.DataFrame: A summary of PET calculations.
     """
+    # Convert to DataFrame if it's a list or array
+    if not isinstance(data, pd.DataFrame):
+        # Check if it's a 3D array (multi-case data)
+        if isinstance(data, (list, np.ndarray)) and len(np.array(data).shape) == 3:
+            # For 3D data with shape (cases, measurements, variables)
+            cases_data = []
+            for i, case_data in enumerate(data):
+                case_df = pd.DataFrame(case_data)
+                case_df['case'] = f'Case{i+1}'  # Assign case names
+                cases_data.append(case_df)
+            data = pd.concat(cases_data, ignore_index=True)
+        else:
+            # For 2D data (single case)
+            data = pd.DataFrame(data)
+            if 'case' not in data.columns:
+                data['case'] = 'Case1'  # Default case name
 
     # Ensure "case" column exists
     if "case" not in data.columns:
