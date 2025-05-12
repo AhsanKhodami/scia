@@ -25,17 +25,24 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install build wheel
+          pip install build wheel twine
 
       - name: Build package
         run: |
           python -m build
 
-      - name: Check built package
+      - name: Debug built package
         run: |
-          pip install twine
-          twine check dist/*
+          echo "=== Built files ==="
           ls -la dist/
+          echo "=== Twine check result ==="
+          twine check dist/* --verbose
+          echo "=== Contents of wheel ==="
+          python -m zipfile -l dist/*.whl
+          echo "=== Extract and check METADATA ==="
+          python -m zipfile -e dist/*.whl temp_check
+          echo "=== METADATA content ==="
+          cat temp_check/*/METADATA
 
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@v1.8.11
