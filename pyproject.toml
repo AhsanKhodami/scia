@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "scia"
-version = "1.8.0"
+version = "2.0"
 authors = [
   {name = "Mohammad Ahsan Khodami", email = "ahsan.khodami@gmail.com"},
 ]
