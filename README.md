@@ -6,4 +6,19 @@ scia is a robust Python package dedicated to single-case data analysis. Designed
 
 -Documentation is on going and reading, please be patient with it.
 
-For full documentation, please visit our [Documentation](https://ahsankhodami.github.io/scia/rci.html) 🚀📚
+## 📚 Documentation
+
+<div align="center">
+  <a href="https://ahsankhodami.github.io/scia/intro.html">
+    <img src="https://img.shields.io/badge/Documentation-Read%20Now-blue?style=for-the-badge&logo=read-the-docs" alt="Documentation">
+  </a>
+</div>
+
+<br>
+
+✨ **Key Features** ✨
+- Comprehensive statistical methods for single-case analysis
+- Missing value handling and data preprocessing
+- Advanced treatment effect evaluation
+- Bayesian piecewise linear regression
+- Multiple non-overlap and effect size metrics
