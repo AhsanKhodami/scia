@@ -7,52 +7,89 @@ on:
 
 permissions:
   contents: read
-  id-token: write  # Required for PyPI Trusted Publishing
+  id-token: write
 
 jobs:
   build-and-publish:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check out repository with full history
+      - name: Check out repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Critical for setuptools-scm to see tags
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: "3.12"
 
-      - name: Install build dependencies
+      - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install build setuptools-scm[toml] wheel twine
+          pip install build wheel
 
-      - name: Debug git state and tags
+      - name: Extract version from tag
+        id: get_version
         run: |
-          echo "Current tag: ${GITHUB_REF##*/}"
-          echo "Current commit: $(git rev-parse HEAD)"
-          echo "Available tags:"
-          git tag -l | sort -V
-          echo "Describe current commit:"
-          git describe --tags --long --dirty
-          echo "setuptools-scm version:"
-          python -m setuptools_scm
+          VERSION=${GITHUB_REF#refs/tags/v}
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "Building version: $VERSION"
+
+      - name: Create temporary pyproject.toml without setuptools-scm
+        run: |
+          # Backup original
+          cp pyproject.toml pyproject.toml.backup
+          
+          # Create new pyproject.toml with fixed version
+          cat > pyproject.toml << 'EOF'
+          [build-system]
+          requires = ["setuptools>=45", "wheel"]
+          build-backend = "setuptools.build_meta"
+          
+          [project]
+          name = "scia"
+          version = "$VERSION"
+          authors = [
+            {name = "Mohammad Ahsan Khodami", email = "ahsan.khodami@gmail.com"},
+          ]
+          description = "A Comprehensive most updated Python package for Single Case Design Analysis"
+          readme = "README.md"
+          requires-python = ">=3.9"
+          classifiers = [
+            "Programming Language :: Python :: 3",
+            "License :: OSI Approved :: MIT License",
+            "Operating System :: OS Independent",
+          ]
+          dependencies = [
+            "numpy",
+            "pandas",
+            "matplotlib",
+            "scipy",
+            "openpyxl",
+            "scikit-learn",
+            "statsmodels",
+          ]
+          
+          [project.urls]
+          "Homepage" = "https://github.com/AhsanKhodami/scia"
+          
+          [tool.setuptools]
+          packages = ["scia"]
+          EOF
+          
+          # Replace $VERSION with actual version
+          sed -i "s/\$VERSION/$VERSION/g" pyproject.toml
 
       - name: Build package
         run: |
-          echo "Building package..."
           python -m build
-        env:
-          SETUPTOOLS_SCM_DEBUG: "1"
 
-      - name: Verify built package
+      - name: Check built package
         run: |
-          echo "Built files:"
-          ls -la dist/
-          echo "Package metadata:"
+          pip install twine
           twine check dist/*
+          ls -la dist/
 
-      - name: Publish to PyPI (trusted publishing)
+      - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@v1.8.11
