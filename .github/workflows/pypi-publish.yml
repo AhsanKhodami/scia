@@ -20,8 +20,10 @@ jobs:
           pip install build twine
           rm -rf dist/ build/ *.egg-info
           python -m build
-      
-      - uses: pypa/gh-action-pypi-publish@v1.8.11
-        with:
-          user: __token__
-          password: ${{ secrets.PYPI_API_TOKEN }}
+          twine check dist/*
+          
+      - run: |
+          twine upload dist/*
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
