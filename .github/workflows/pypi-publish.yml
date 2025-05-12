@@ -36,7 +36,7 @@ jobs:
           echo "=== Built files ==="
           ls -la dist/
           echo "=== Twine check result ==="
-          twine check dist/* --verbose
+          twine check dist/*
           echo "=== Contents of wheel ==="
           python -m zipfile -l dist/*.whl
           echo "=== Extract and check METADATA ==="
