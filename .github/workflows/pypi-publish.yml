@@ -16,24 +16,38 @@ jobs:
       - name: Check out the repository
         uses: actions/checkout@v4
         with:
-          # Fetch all history and tags
+          # Fetch all history for all branches and tags
           fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.12' # Ensure this matches your project's requirements
+          python-version: '3.12'
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install build setuptools-scm twine
 
-      - name: Build package using build
+      # Debug: Check if git tags are available
+      - name: Debug git tags
+        run: |
+          git tag --list
+          git describe --tags --dirty
+          
+      # Build the package
+      - name: Build package
         run: |
           python -m build
 
-      - name: Check package
+      # Debug: Check the built package metadata
+      - name: Debug package metadata
+        run: |
+          pip install wheel
+          python -m wheel unpack dist/*.whl
+          find . -name "METADATA" -exec cat {} \;
+
+      - name: Check package with twine
         run: |
           twine check dist/*
 
