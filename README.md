@@ -6,4 +6,4 @@ scia is a robust Python package dedicated to single-case data analysis. Designed
 
 -Documentation is on going and reading, please be patient with it.
 
-For full documentation, please visit our [Documentation](https://github.com/ahsankhodami/scia/documentation) 🚀📚
+For full documentation, please visit our [Documentation](https://ahsankhodami.github.io/scia/rci.html) 🚀📚
