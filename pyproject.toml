@@ -1,10 +1,10 @@
 [build-system]
-requires = ["setuptools>=45", "setuptools-scm[toml]>=6.2", "wheel"]
+requires = ["setuptools>=45", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "scia"
-dynamic = ["version"]
+version = "1.8.0"
 authors = [
   {name = "Mohammad Ahsan Khodami", email = "ahsan.khodami@gmail.com"},
 ]
@@ -31,10 +31,3 @@ dependencies = [
 
 [tool.setuptools]
 packages = ["scia"]
-
-[tool.setuptools_scm]
-version_scheme = "guess-next-dev"
-local_scheme = "no-local-version"
-fallback_version = "0.0.999"
-write_to = "scia/_version.py"
-write_to_template = '__version__ = "{version}"'
