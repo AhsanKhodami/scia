@@ -1,12 +1,16 @@
 # Dynamically retrieve version from setuptools-scm
 try:
-    from ._version import version as __version__
+    from ._version import __version__
 except ModuleNotFoundError:
-    __version__ = "dev"  # Fallback for development mode
+    # If running from source, use setuptools-scm
+    try:
+        from setuptools_scm import get_version
+        __version__ = get_version(root='..', relative_to=__file__)
+    except:
+        __version__ = "dev"  # Fallback for development mode
 
 # Print a message when the package is imported
 print(f"📖 scia {__version__} - For Documentation, visit: https://ahsankhodami.github.io/scia/intro.html")
-
 
 from .data import create_scd
 from .fill_missing import fill_missing
@@ -29,7 +33,7 @@ from .autocorr import autocorr
 from .corrected_tau import corrected_tau
 from .nap import nap
 from .overlap import overlap
-from .select import select_cases
+# from .select import select_cases  # Remove duplicate import
 from .as_data_frame import as_data_frame
 from .describe import describe
 from .prepare_scdf import prepare_scdf

@@ -1,9 +1,33 @@
 [build-system]
-requires = ["setuptools", "wheel", "setuptools-scm"]
+requires = ["setuptools>=45", "setuptools-scm", "wheel"]
 build-backend = "setuptools.build_meta"
 
-[tool.setuptools_scm]
-version_scheme = "release-branch-semver"
-local_scheme = "no-local-version"
-write_to = "scia/_version.py"
+[project]
+name = "scia"
+dynamic = ["version"]
+authors = [
+    {name = "Mohammad Ahsan Khodami", email = "ahsan.khodami@gmail.com"},
+]
+description = "A Comprehensive most updated Python package for Single Case Design Analysis"
+readme = "README.md"
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "numpy",
+    "pandas",
+    "matplotlib",
+    "scipy",
+    "openpyxl",
+    "scikit-learn",
+    "statsmodels",
+]
 
+[project.urls]
+"Homepage" = "https://github.com/Ahsankhodami/scia"
+
+[tool.setuptools-scm]
+write_to = "scia/_version.py"
