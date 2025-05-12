@@ -17,7 +17,7 @@ jobs:
       - name: Check out repository with full history
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # required for setuptools-scm to see tags
+          fetch-depth: 0  # Critical for setuptools-scm to see tags
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -29,25 +29,30 @@ jobs:
           python -m pip install --upgrade pip
           pip install build setuptools-scm[toml] wheel twine
 
-      - name: Verify Git tag and HEAD
+      - name: Debug git state and tags
         run: |
-          echo "🔖 GITHUB_REF = $GITHUB_REF"
-          echo "🔢 Extracted tag = ${GITHUB_REF##*/}"
-          git describe --tags --exact-match || echo "⚠️ No exact tag match"
+          echo "Current tag: ${GITHUB_REF##*/}"
+          echo "Current commit: $(git rev-parse HEAD)"
+          echo "Available tags:"
+          git tag -l | sort -V
+          echo "Describe current commit:"
+          git describe --tags --long --dirty
+          echo "setuptools-scm version:"
+          python -m setuptools_scm
 
-      - name: Extract version from tag
-        id: tag_version
-        run: echo "VERSION=${GITHUB_REF##*/}" >> $GITHUB_ENV
-
-      - name: Build package with forced version
+      - name: Build package
         run: |
-          echo "📦 Building version: ${VERSION#v}"
-          SETUPTOOLS_SCM_PRETEND_VERSION=${VERSION#v} python -m build
+          echo "Building package..."
+          python -m build
         env:
           SETUPTOOLS_SCM_DEBUG: "1"
 
-      - name: Check built package
-        run: twine check dist/*
+      - name: Verify built package
+        run: |
+          echo "Built files:"
+          ls -la dist/
+          echo "Package metadata:"
+          twine check dist/*
 
       - name: Publish to PyPI (trusted publishing)
         uses: pypa/gh-action-pypi-publish@v1.8.11
