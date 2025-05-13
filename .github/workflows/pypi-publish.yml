@@ -9,10 +9,6 @@ jobs:
   publish:
     runs-on: ubuntu-latest
 
-    # ✅ Add permissions to allow trusted publishing
-    permissions:
-      id-token: write  # Required for OpenID Connect authentication
-
     steps:
       - name: Check out the repository
         uses: actions/checkout@v3
@@ -33,5 +29,9 @@ jobs:
       - name: Build the package
         run: python -m build
 
-      - name: Publish to PyPI
-        uses: pypa/gh-action-pypi-publish@v1.8.11
+      - name: Publish to PyPI using twine
+        run: |
+          twine upload dist/*
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
